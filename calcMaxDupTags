@@ -1,0 +1,48 @@
+if [ $# == 0 ]; then
+echo "
+Usage: calcMaxDupTags genome_size numTags p-value* py-OR-R [hist]
+  - where p-value is the probability of seeing this many or more tags at 1 site give number of tags and genome size
+  - in this context, the larger the p-value, the more conservative and the smaller, the more forgiving
+	- the reason: a smaller pvalue allowance means you are allowing smaller probability events to occur
+	- i.e. this is a p-value allowance more than a pvalue cutoff
+	- i.e. you are looking for events that are explained by the null, not events that reject it
+		- you are trying to put a ceiling on events that reject the null
+
+  - the py-OR-R specifies which language to calculate in
+	- py uses the macs2 functions directly
+	- R uses an R implementation which is actually much faster (default if not specified)
+  - [hist] -- since the arguments are positional, the language needs to be specified to use "hist"
+	- this generates a histogram by 'sampling 10,000 sites from the null binomial dist' and reporting the "number of reads" at those sites
+	- this gives you an idea of what the dist looks like (remember this is what it looks like if enrichment was uniform across genome)
+
+  - if you want to account for strand, then the genomesize should be 2x as large
+  - if you are mapping to a single repeat, the effective genomesize is repeatSize/numRepeats
+	- this makes it so prob(success) is 1/repeatSize/numRepeats = numRepeats/RepeatSize instead of 1/RepeatSize
+"
+exit 0
+fi
+
+genome_size=$1
+numTags=$2
+p=$3
+language=$4
+pyscript=macs2_cal_max_dup_tags.py
+rscript=~/searchPaths/software/calcMaxDupTags/macs2_cal_max_dup_tags.R
+
+## go to default if not spec
+if [ $# -lt 4 ]; then
+  language=R
+fi
+
+if [ $language == "py" ]; then
+  $pyscript $genome_size $numTags $p
+elif [ $language == "R" ]; then
+  Rscript $rscript $genome_size $numTags $p
+fi
+
+if [ $# -gt 4 ]; then
+ if [ $5 == "hist" ]; then
+   Rscript ~/searchPaths/software/calcMaxDupTags/histReadsAtSitesUniform.R $genome_size $numTags
+   open Rplots.pdf
+ fi 
+fi
