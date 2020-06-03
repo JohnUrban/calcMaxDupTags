@@ -1,6 +1,6 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python2.7
 import sys
-sys.path.append("/usr/local/lib/python2.7/site-packages/MACS2/")
+
 
 from filterdup import cal_max_dup_tags
 from cProb import binomial_cdf_inv, binomial_pdf

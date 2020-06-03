@@ -1,6 +1,7 @@
 if [ $# == 0 ]; then
 echo "
 Usage: calcMaxDupTags genome_size numTags p-value* py-OR-R [hist]
+
   - where p-value is the probability of seeing this many or more tags at 1 site give number of tags and genome size
   - in this context, the larger the p-value, the more conservative and the smaller, the more forgiving
 	- the reason: a smaller pvalue allowance means you are allowing smaller probability events to occur
@@ -26,8 +27,10 @@ genome_size=$1
 numTags=$2
 p=$3
 language=$4
-pyscript=macs2_cal_max_dup_tags.py
-rscript=~/searchPaths/software/calcMaxDupTags/macs2_cal_max_dup_tags.R
+
+MAIN=$( dirname $0 )
+pyscript=${MAIN}/macs2_cal_max_dup_tags.py
+rscript=${MAIN}/macs2_cal_max_dup_tags.R
 
 ## go to default if not spec
 if [ $# -lt 4 ]; then
